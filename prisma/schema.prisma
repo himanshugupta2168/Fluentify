@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id           String    @id @default(uuid())
+  userName          String    @default("User")
+  userImageSrc      String    @default("/logo.svg")
+  hearts            Int       @default(5)
+  points            Int       @default(0)
+  userPurchasesCourse userPurchasedCourses[]
+  activeCourse      courses @relation(fields: [activeCourseId], references: [course_id])
+  activeCourseId    Int    
+  solvedChallenges   ChallengeProgress[]
+}
+
+model courses {
+  course_id         Int   @id @default(autoincrement())
+  title             String
+  imageSrc          String
+  users             userPurchasedCourses[]
+  usersActive       User[]
+  units             Units[]
+
+}
+
+model userPurchasedCourses {
+  user             User             @relation(fields: [user_id], references: [user_id])
+  user_id          String
+  courses          courses          @relation(fields: [course_id], references: [course_id])
+  course_id        Int
+
+  @@id([user_id, course_id])
+}
+
+model Units {
+  unit_id          Int            @unique @default(autoincrement())
+  course           courses        @relation(fields: [course_id], references: [course_id])
+  course_id        Int
+  title            String 
+  description      String
+  order            Int?
+  lessons          Lesson[]
+}
+
+
+model Lesson {
+  lesson_id       Int             @unique   @default(autoincrement())
+  title           String
+  description     String 
+  ofUnit          Units           @relation(fields: [unit_id], references: [unit_id])
+  unit_id         Int
+  order           Int?
+  challenges      Challenges[]
+}
+
+
+enum challengeType {
+  SELECT  
+  ASSIST
+}
+
+model   Challenges{
+  challenge_id   Int              @unique   @default(autoincrement())
+  lesson         Lesson            @relation(fields: [lesson_id], references: [lesson_id])
+  lesson_id      Int
+  type           challengeType
+  question       String
+  order          Int?
+  options        challengeOptions[]
+  challengeProgress ChallengeProgress[]
+}
+
+
+model challengeOptions{
+  challengeOption_id      Int     @unique   @default( autoincrement())
+  challenge               Challenges         @relation(fields: [challenge_id], references: [challenge_id])
+  challenge_id            Int
+  text                    String
+  correct                 Boolean            @default(false)
+  imageSrc                String
+  audioSrc                String
+}
+
+model ChallengeProgress {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(fields: [userId], references: [user_id])
+  userId         String
+  challenge      Challenges   @relation(fields: [challengeId], references: [challenge_id])
+  challengeId    Int
+  completed      Boolean      @default(false)
+
+  @@unique([userId, challengeId])
+}
