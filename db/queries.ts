@@ -223,7 +223,6 @@ export const getLesson = cache(async(id?:number)=>{
                         select:{
                             challenge:true,
                             completed:true,
-
                         }
                     }
                 },

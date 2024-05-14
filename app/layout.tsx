@@ -4,8 +4,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/themeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-
 const font = Nunito({ subsets: ["latin"] });
+import { ExitModal } from "@/components/exit-modal";
 
 export const metadata: Metadata = {
   title: "Fluentify ",
@@ -27,7 +27,6 @@ export default function RootLayout({
       },
     }}>
       <html lang="en">
-        <link rel="shortcut icon" href="../public/logo.svg" type="image/x-icon" />
         <body className={font.className}>
         <ThemeProvider
             attribute="class"
@@ -35,8 +34,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Toaster/>
-          {children}
+              <Toaster/>
+              <ExitModal/>
+              {children}
           </ThemeProvider>
           </body>
       </html>
